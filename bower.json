@@ -1,0 +1,25 @@
+{
+  "name": "angular2-checklist",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Ash Blue"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/ashblue/angular2-checklist",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "lodash": "^4.11.2",
+    "bootstrap-sass": "^3.3.6",
+    "jquery": "^2.2.3",
+    "font-awesome": "^4.6.2",
+    "moment": "^2.13.0"
+  }
+}
