@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "removeComments": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "outFile": "app.js"
+  },
+
+  "exclude": [
+    "node_modules",
+    "bower_components",
+    "typings/main",
+    "typings/main.d.ts"
+  ]
+}
