@@ -47,15 +47,12 @@ gulp.task('clear-tmp', function () {
   clearFolder(FOLDER_TMP + '/**/*');
 });
 
-gulp.task('webserver', function () {
+gulp.task('serve', function () {
   gulp.src(FOLDER_TMP)
     .pipe(webserver({
+      livereload: true,
       open: true
     }));
-});
-
-gulp.task('webserver-livereload', function () {
-
 });
 
 // @TODO If production mode Ugflify compiled files
@@ -65,6 +62,13 @@ gulp.task('copy-dependencies', function () {
   return gulp.src(bundle)
     .pipe(concat('dependencies.js'))
     .pipe(gulp.dest(FOLDER_TMP + '/'));
+});
+
+gulp.task('watch', function () {
+  gulp.watch('src/**/*.ts', ['compile-ts']);
+  gulp.watch('src/index.html', ['copy-html']);
+  gulp.watch('src/build-config', ['copy-dependencies']);
+  // gulp.watch('src/**/*.css', ['css']);
 });
 
 function clearFolder (folder) {
@@ -79,4 +83,6 @@ gulp.task('mode-prod', function () {
   process.env.GULP_MODE = 'prod';
 });
 
-gulp.task('default', ['clear-tmp', 'compile-ts', 'copy-html', 'copy-dependencies', 'webserver']);
+gulp.task('default', ['dev']);
+gulp.task('dev', ['build', 'watch', 'serve']);
+gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'copy-dependencies']);
