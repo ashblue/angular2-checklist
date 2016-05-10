@@ -3,6 +3,8 @@
  * @author Ash Blue
  * @TODO Exclude sourcemaps during production mode
  * @TODO If production mode Ugflify compiled files
+ * @TODO If production mode compress css
+ * @TODO Destination directory for fonts taken from build-config.js
  */
 
 var gulp = require('gulp');
