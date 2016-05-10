@@ -8,12 +8,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!--<link rel="icon" type="image/x-icon" href="favicon.ico">-->
   <!--stylesheet ref-->
-
-  {{content-for 'head'}}
 </head>
 <body>
-  <p>Loading...</p>
+  <my-app>Loading...</my-app>
 
+  <script src="lib/es6-shim.js"></script>
+  <script src="lib/angular2-polyfills.js"></script>
+  <script src="lib/traceur-runtime.js"></script>
+  <script src="lib/system-csp-production.src.js"></script>
+  <script src="lib/Reflect.js"></script>
+
+  <script src="lib/angular2.js"></script>
+  <script src="lib/Rx.js"></script>
+
+  <!--<script src="bower.js"></script>-->
   <script src="app.js"></script>
+
+  <script>
+    System.import('main').catch(function(err){ console.error(err);  });
+  </script>
 </body>
 </html>

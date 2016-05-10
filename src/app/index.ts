@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component } from 'angular2/core';
 export class Hero {
   id: number;
   name: string;
@@ -23,4 +23,8 @@ export class Index {
     id: 1,
     name: 'Windstorm'
   };
+
+  constructor () {
+    console.log('hit');
+  }
 }
