@@ -1,18 +1,18 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
+var webserver = require('gulp-webserver');
+var concat = require('gulp-concat');
+var sourcemaps = require('gulp-sourcemaps'); // Sourcemaps must be manually generated due to a bug with typescript gulp compilation
+
 var del = require('del');
 var path = require('path');
-var webserver = require('gulp-webserver');
-var bootstrap = require('./src/build-config');
 
-// Sourcemaps must be manually generated due to a bug with typescript gulp compilation
-var sourcemaps = require('gulp-sourcemaps');
+var tsProject = ts.createProject('src/tsconfig.json');
+var bootstrap = require('./src/build-config');
 
 const SRC_ROOT = 'src';
 const FOLDER_DIST = 'dist';
 const FOLDER_TMP = 'tmp';
-
-var tsProject = ts.createProject('src/tsconfig.json');
 
 // gulp.task('default', function() {
   // Bare bones task that runs typescript
@@ -58,33 +58,25 @@ gulp.task('webserver-livereload', function () {
 
 });
 
-// @TODO Concatenate into a single file
-// @TODO Include bower files
-// @TODO Create a dependency list pulled in via export
-// @TODO Ugflify compiled files
+// @TODO If production mode Ugflify compiled files
 gulp.task('copy-dependencies', function () {
-  return gulp.src([
-      'bower_components/system.js/dist/system-csp-production.src.js',
-      'bower_components/system.js/dist/system.js',
-      'node_modules/reflect-metadata/Reflect.js',
-      'node_modules/angular2/bundles/angular2.js',
-      'node_modules/angular2/bundles/angular2-polyfills.js',
-      'node_modules/es6-shim/es6-shim.js',
-      'node_modules/es6-shim/es6-shim.map',
-      'bower_components/traceur-runtime/traceur-runtime.js',
-      'node_modules/rxjs/bundles/Rx.js',
-      'node_modules/rxjs/bundles/Rx.js.map'
-    ])
-    .pipe(gulp.dest(FOLDER_TMP + '/lib'));
-});
+  var bundle = bootstrap.dependencies.core.concat(bootstrap.dependencies.other);
 
-// gulp.task('copy-dependencies', function () {
-//   return gulp.src(bootstrap.dependencies.core)
-//     .pipe(gulp.dest(FOLDER_TMP + '/lib'));
-// });
+  return gulp.src(bundle)
+    .pipe(concat('dependencies.js'))
+    .pipe(gulp.dest(FOLDER_TMP + '/'));
+});
 
 function clearFolder (folder) {
   del([folder + "/**/*"]);
 }
+
+gulp.task('mode-dev', function () {
+  process.env.GULP_MODE = 'dev';
+});
+
+gulp.task('mode-prod', function () {
+  process.env.GULP_MODE = 'prod';
+});
 
 gulp.task('default', ['clear-tmp', 'compile-ts', 'copy-html', 'copy-dependencies', 'webserver']);
