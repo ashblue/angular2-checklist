@@ -10,6 +10,7 @@
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
+    "gulp-sass": "^2.3.1",
     "gulp-typescript": "^2.13.3",
     "gulp-webserver": "^0.9.1",
     "reflect-metadata": "^0.1.2",
