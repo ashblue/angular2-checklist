@@ -5,6 +5,10 @@
  * @TODO If production mode Ugflify compiled files
  * @TODO If production mode compress css
  * @TODO Destination directory for fonts taken from build-config.js
+ * @TODO Typescript lint declaration
+ * @TODO Do we need JSCS?
+ * @TODO Do we need JSHint?
+ * @TODO CLI files should include an @author for every file
  */
 
 var gulp = require('gulp');
@@ -27,13 +31,7 @@ const SRC_ROOT = 'src';
 const SRC_STYLES = SRC_ROOT + '/styles';
 const FOLDER_DIST = 'dist';
 const FOLDER_TMP = 'tmp';
-
-// gulp.task('default', function() {
-  // Bare bones task that runs typescript
-    // typscript linter
-  // Do we need JSCS?
-  // Do we need JSHint?
-// });
+const FOLDER_NODE_MODULES = 'node_modules';
 
 gulp.task('compile-css', function () {
   return gulp.src(SRC_STYLES + '/**/*.scss')
@@ -70,11 +68,29 @@ gulp.task('clear-tmp', function () {
 });
 
 gulp.task('serve', function () {
+  // Load static assets from node modules
+  gulp.src(FOLDER_NODE_MODULES)
+    .pipe(webserver({
+      port: 8010
+    }));
+
+  // Puke out the dynamically compiled files
   gulp.src(FOLDER_TMP)
     .pipe(webserver({
       livereload: true,
-      open: true
+      open: true,
+      proxies: [
+        {
+          source: '/node_modules',
+          target: 'http://localhost:8010'
+        }
+      ]
     }));
+});
+
+gulp.task('copy-system-map', function () {
+  return gulp.src('src/system.config.js')
+    .pipe(gulp.dest(FOLDER_TMP + '/'));
 });
 
 gulp.task('copy-dependencies', function () {
@@ -88,9 +104,9 @@ gulp.task('copy-dependencies', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch('src/**/*.ts', ['compile-ts']);
+  gulp.watch(['src/**/*.ts', 'src/tsconfig.json'], ['compile-ts']);
   gulp.watch('src/index.html', ['copy-html']);
-  gulp.watch('src/build-config', ['copy-dependencies']);
+  gulp.watch(['src/build-config.js', 'src/system.config.js'], ['copy-dependencies']);
   gulp.watch(SRC_STYLES + '/**/*.scss', ['compile-css']);
 });
 
@@ -108,4 +124,4 @@ gulp.task('mode-prod', function () {
 
 gulp.task('default', ['dev']);
 gulp.task('dev', ['build', 'watch', 'serve']);
-gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'compile-css', 'copy-dependencies']);
+gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'compile-css', 'copy-dependencies', 'copy-system-map']);
