@@ -20,6 +20,7 @@ var sourcemaps = require('gulp-sourcemaps'); // Sourcemaps must be manually gene
 var sass = require('gulp-sass');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
+var cleanCSS = require('gulp-clean-css');
 
 // Node packages
 var del = require('del');
@@ -43,6 +44,12 @@ gulp.task('compile-css', function () {
     .pipe(sass().on('error', sass.logError))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(FOLDER_TMP));
+});
+
+gulp.task('copy-css-to-dist', ['compile-css'], function () {
+  return gulp.src(`${FOLDER_TMP}/index.css`)
+    .pipe(cleanCSS())
+    .pipe(gulp.dest(FOLDER_DIST));
 });
 
 gulp.task('copy-html', function () {
@@ -150,11 +157,9 @@ gulp.task('copy-tmp-to-dist', ['build'], function () {
   return gulp.src([
     `${FOLDER_TMP}/**/*`,
     `!${FOLDER_TMP}/angular2-src`,
-    `!${FOLDER_TMP}/angular2-src/**/*`,
-    `!${FOLDER_TMP}/dependencies.js`,
-    `!${FOLDER_TMP}/app.js`,
-    `!${FOLDER_TMP}/**/*.map`,
-    `!${FOLDER_TMP}/system.config.js`
+    `!${FOLDER_TMP}/**/*.css`,
+    `!${FOLDER_TMP}/**/*.js`,
+    `!${FOLDER_TMP}/**/*.map`
   ]).pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
@@ -195,5 +200,23 @@ gulp.task('dev', ['mode-dev', 'build', 'watch', 'serve']);
 gulp.task('prod', ['mode-prod', 'build-prod']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
-gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'compile-css', 'copy-dependencies', 'copy-system-map']);
-gulp.task('build-prod', ['clear-dist', 'build', 'bundle-angular-src', 'copy-tmp-to-dist', 'copy-dependencies-to-dist', 'copy-app-to-dist', 'copy-angular-src-to-dist', 'copy-system-map-prod']);
+gulp.task('build', [
+  'clear-tmp', 
+  'compile-ts',
+  'copy-html',
+  'compile-css',
+  'copy-dependencies',
+  'copy-system-map'
+]);
+
+gulp.task('build-prod', [
+  'clear-dist',
+  'build',
+  'bundle-angular-src',
+  'copy-tmp-to-dist',
+  'copy-css-to-dist',
+  'copy-dependencies-to-dist',
+  'copy-app-to-dist',
+  'copy-angular-src-to-dist',
+  'copy-system-map-prod'
+]);
