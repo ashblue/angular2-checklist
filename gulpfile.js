@@ -9,6 +9,7 @@
  * @TODO Do we need JSCS?
  * @TODO Do we need JSHint?
  * @TODO CLI files should include an @author for every file
+ * @TODO Include build configuration target (dev, prod, qa)
  */
 
 var gulp = require('gulp');
@@ -17,6 +18,7 @@ var webserver = require('gulp-webserver');
 var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps'); // Sourcemaps must be manually generated due to a bug with typescript gulp compilation
 var sass = require('gulp-sass');
+var rename = require('gulp-rename');
 
 // Node packages
 var del = require('del');
@@ -25,6 +27,7 @@ var path = require('path');
 // Custom packages
 var tsProject = ts.createProject('src/tsconfig.json');
 var bootstrap = require('./src/build-config');
+var angular2Src = require('./systemjs/angular2-src');
 
 // Constants
 const SRC_ROOT = 'src';
@@ -67,7 +70,12 @@ gulp.task('clear-tmp', function () {
   clearFolder(FOLDER_TMP + '/**/*');
 });
 
-gulp.task('serve', function () {
+gulp.task('clear-dist', function () {
+  clearFolder(FOLDER_DIST);
+  clearFolder(FOLDER_DIST + '/**/*');
+});
+
+gulp.task('serve', ['build'], function () {
   // Load static assets from node modules
   gulp.src(FOLDER_NODE_MODULES)
     .pipe(webserver({
@@ -88,9 +96,22 @@ gulp.task('serve', function () {
     }));
 });
 
+gulp.task('serve-prod', ['build-prod'], function () {
+  gulp.src(FOLDER_DIST)
+    .pipe(webserver({
+      open: true
+    }));
+});
+
 gulp.task('copy-system-map', function () {
   return gulp.src('src/system.config.js')
     .pipe(gulp.dest(FOLDER_TMP + '/'));
+});
+
+gulp.task('copy-system-map-prod', ['build'], function () {
+  return gulp.src('src/system.config-prod.js')
+    .pipe(rename('system.config.js'))
+    .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
 gulp.task('copy-dependencies', function () {
@@ -111,8 +132,46 @@ gulp.task('watch', function () {
 });
 
 function clearFolder (folder) {
-  del([folder + "/**/*"]);
+  del.sync([folder + "/**/*"]);
 }
+
+gulp.task('bundle-angular-src', ['build'], function (cb) {
+  // Build all the angular dependencies
+  angular2Src.build(function () {
+    console.log('build complete successfully');
+    cb();
+  }, function () {
+    cb(err);
+  });
+});
+
+gulp.task('copy-tmp-to-dist', ['build'], function () {
+  return gulp.src([
+    `${FOLDER_TMP}/**/*`,
+    `!${FOLDER_TMP}/angular2-src`,
+    `!${FOLDER_TMP}/angular2-src/**/*`,
+    `!${FOLDER_TMP}/dependencies.js`,
+    `!${FOLDER_TMP}/app.js`,
+    `!${FOLDER_TMP}/**/*.map`,
+    `!${FOLDER_TMP}/system.config.js`
+  ]).pipe(gulp.dest(FOLDER_DIST + '/'));
+});
+
+// @TODO Uglify
+gulp.task('copy-dependencies-to-dist', ['copy-dependencies', 'bundle-angular-src'], function () {
+  return gulp.src([
+    `${FOLDER_TMP}/dependencies.js`,
+    `${FOLDER_TMP}/angular2-src/**/*`
+  ])
+    .pipe(concat('dependencies.js'))
+    .pipe(gulp.dest(FOLDER_DIST + '/'));
+});
+
+// @TODO Uglify
+gulp.task('copy-app-to-dist', ['compile-ts'], function () {
+  return gulp.src(`${FOLDER_TMP}/app.js`)
+    .pipe(gulp.dest(FOLDER_DIST + '/'));
+});
 
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
@@ -123,5 +182,9 @@ gulp.task('mode-prod', function () {
 });
 
 gulp.task('default', ['dev']);
-gulp.task('dev', ['build', 'watch', 'serve']);
+gulp.task('dev', ['mode-dev', 'build', 'watch', 'serve']);
+gulp.task('prod', ['mode-prod', 'build-prod']);
+gulp.task('prod-test', ['prod', 'serve-prod']);
+
 gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'compile-css', 'copy-dependencies', 'copy-system-map']);
+gulp.task('build-prod', ['clear-dist', 'build', 'bundle-angular-src', 'copy-tmp-to-dist', 'copy-dependencies-to-dist', 'copy-app-to-dist', 'copy-system-map-prod']);

@@ -36,3 +36,4 @@ bower_components
 # Compiler output temporary folders
 tmp
 dist
+dist.zip

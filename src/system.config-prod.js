@@ -1,14 +1,12 @@
 /**
- * Angular 2 loader for various assets in dev mode. In production mode a separate map will be used
- * to compile all the assets. See `system.config-prod.js`
+ * System.js mappings that will replace system.config.js on production build
  * @TODO Compile this into typescript
+ * @TODO Compile with system.config.js and strip out / include what we need with a conditional comment parser via Gulp.js
  */
 (function (global) {
 
   // map tells the System loader where to look for things
-  var map = {
-    '@angular': 'node_modules/@angular'
-  };
+  var map = {};
 
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {};
