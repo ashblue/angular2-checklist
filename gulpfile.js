@@ -38,6 +38,7 @@ const SRC_STYLES = SRC_ROOT + '/styles';
 const FOLDER_DIST = 'dist';
 const FOLDER_TMP = 'tmp';
 const FOLDER_NODE_MODULES = 'node_modules';
+const FOLDER_PUBLIC = SRC_ROOT + '/public';
 
 gulp.task('compile-css', function () {
   return gulp.src(SRC_STYLES + '/index.scss')
@@ -179,6 +180,16 @@ gulp.task('copy-fonts', function () {
     .pipe(gulp.dest(FOLDER_TMP + '/fonts/'));
 });
 
+gulp.task('copy-public', function () {
+  return gulp.src(FOLDER_PUBLIC + '/**/*')
+    .pipe(gulp.dest(FOLDER_TMP + '/public/'));
+});
+
+gulp.task('copy-public-to-dist', function () {
+  return gulp.src(FOLDER_PUBLIC + '/**/*')
+    .pipe(gulp.dest(FOLDER_DIST + '/public/'));
+});
+
 gulp.task('copy-angular-src-to-dist', ['bundle-angular-src'], function () {
   return gulp.src([
     `${FOLDER_TMP}/angular2-src/**/*`
@@ -216,6 +227,7 @@ gulp.task('build', [
   'clear-tmp',
   'compile-ts',
   'copy-html',
+  'copy-public',
   'compile-css',
   'copy-dependencies',
   'copy-system-map',
@@ -231,7 +243,8 @@ gulp.task('build-prod', [
   'copy-dependencies-to-dist',
   'copy-app-to-dist',
   'copy-angular-src-to-dist',
-  'copy-system-map-prod'
+  'copy-system-map-prod',
+  'copy-public-to-dist'
 ]);
 
 gulp.task('build-prod-zip', ['build-prod', 'dist-zip']);
