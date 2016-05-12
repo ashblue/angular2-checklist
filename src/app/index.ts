@@ -7,8 +7,8 @@ export class Hero {
 @Component({
   selector: 'my-app',
   template:`
-    <h1>{{title}}</h1>
-    <h2>{{hero.name}} details!</h2>
+    <h1>{{title}} <span class="glyphicon glyphicon-search" aria-hidden="true"></span></h1>
+    <h2>{{hero.name}} details! <i class="fa fa-camera-retro" aria-hidden="true"></i></h2>
     <div><label>id: </label>{{hero.id}}</div>
     <div>
       <label>name: </label>

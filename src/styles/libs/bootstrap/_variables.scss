@@ -1,0 +1,43 @@
+// Weird inheritance issue requres fonts to be declared first
+$font-family-sans-serif: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-base: $font-family-sans-serif !default;
+$icon-font-path: "/fonts/" !default;
+
+// @src See http://bootstrap.com/customize for options
+@import "../../../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+
+$border-radius-base: 0;
+
+$cp-autopay-green: #539daf;
+$headings-color: $cp-autopay-green;
+$text-muted: #aaa;
+
+$input-color-placeholder: #ccc;
+$input-color: #777;
+$input-border-radius: 0;
+$input-border-radius-large: 0;
+$input-border-radius-small: 0;
+
+$btn-border-radius-base: 0;
+$btn-border-radius-large: 0;
+$btn-border-radius-small: 0;
+
+$alert-border-radius: 0;
+$alert-padding: 10px 20px;
+
+$alert-success-bg:            $state-success-bg !default;
+$alert-success-text:          $state-success-text !default;
+$alert-success-border:        lighten($state-success-text, 40%);
+
+$alert-info-bg:               $state-info-bg !default;
+$alert-info-text:             $state-info-text !default;
+$alert-info-border:           lighten($state-info-text, 40%);
+
+$alert-warning-bg:            $state-warning-bg !default;
+$alert-warning-text:          $state-warning-text !default;
+$alert-warning-border:        lighten($state-warning-text, 40%);
+
+$alert-danger-bg:             $state-danger-bg !default;
+$alert-danger-text:           $state-danger-text !default;
+$alert-danger-border:         lighten($state-danger-text, 40%);
+

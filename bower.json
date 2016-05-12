@@ -24,6 +24,7 @@
     "traceur-runtime": "^0.0.108",
     "system.js": "^0.19.27",
     "traceur": "^0.0.108",
-    "es6-shim": "^0.35.0"
+    "es6-shim": "^0.35.0",
+    "node-uuid": "^1.4.7"
   }
 }

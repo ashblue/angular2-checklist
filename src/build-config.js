@@ -3,7 +3,7 @@
  * All file paths are relative to the project root
  */
 module.exports = {
-  // Files that will be pre-compiled into the project and mangled
+  // Files that will be pre-compiled into the project and mangled. Please note JavaScript files only here
   dependencies: {
     // @TODO Load all of these files through bower_components, not node_modules (note not all have bower packages YET)
     // Some Angular 2 files do not compile properly as individual files for some odd reason
@@ -17,7 +17,16 @@ module.exports = {
 
     // 3rd party packages as a bundle to be included with your project
     other: [
-
+      'bower_components/jquery/dist/jquery.js',
+      'bower_components/bootstrap-sass/assets/javascripts/bootstrap.js',
+      'bower_components/lodash/dist/lodash.js',
+      'bower_components/node-uuid/uuid.js',
+      'bower_components/moment/moment.js'
     ]
-  }
+  },
+
+  fonts: [
+    'bower_components/bootstrap-sass/assets/fonts/bootstrap/**/*',
+    'bower_components/font-awesome/fonts/**/*'
+  ]
 };

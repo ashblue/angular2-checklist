@@ -29,7 +29,7 @@ var path = require('path');
 
 // Custom packages
 var tsProject = ts.createProject('src/tsconfig.json');
-var bootstrap = require('./src/build-config');
+var buildConfig = require('./src/build-config');
 var angular2Src = require('./systemjs/angular2-src');
 
 // Constants
@@ -40,7 +40,7 @@ const FOLDER_TMP = 'tmp';
 const FOLDER_NODE_MODULES = 'node_modules';
 
 gulp.task('compile-css', function () {
-  return gulp.src(SRC_STYLES + '/**/*.scss')
+  return gulp.src(SRC_STYLES + '/index.scss')
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
     .pipe(sourcemaps.write('.'))
@@ -124,7 +124,7 @@ gulp.task('copy-system-map-prod', ['build'], function () {
 });
 
 gulp.task('copy-dependencies', function () {
-  var bundle = bootstrap.dependencies.core.concat(bootstrap.dependencies.other);
+  var bundle = buildConfig.dependencies.core.concat(buildConfig.dependencies.other);
 
   return gulp.src(bundle)
     .pipe(sourcemaps.init())
@@ -174,6 +174,11 @@ gulp.task('copy-dependencies-to-dist', ['copy-dependencies'], function () {
     .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
+gulp.task('copy-fonts', function () {
+  return gulp.src(buildConfig.fonts)
+    .pipe(gulp.dest(FOLDER_TMP + '/fonts/'));
+});
+
 gulp.task('copy-angular-src-to-dist', ['bundle-angular-src'], function () {
   return gulp.src([
     `${FOLDER_TMP}/angular2-src/**/*`
@@ -213,7 +218,8 @@ gulp.task('build', [
   'copy-html',
   'compile-css',
   'copy-dependencies',
-  'copy-system-map'
+  'copy-system-map',
+  'copy-fonts'
 ]);
 
 gulp.task('build-prod', [
