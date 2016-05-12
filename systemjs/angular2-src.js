@@ -61,7 +61,7 @@ var externalBuild = {
       builderExt.loadConfig('systemjs/system.config.js');
 
       var src = `${PACKAGE_PREFIX}/${name}/${PACKAGE_POSTFIX}`;
-      var target = `${BUILD_OUTPUT}/${name}.js`;
+      var target = `${BUILD_OUTPUT}/${name}/index.js`;
 
       builderExt.bundle(src, target)
         .then(function () {

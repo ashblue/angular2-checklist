@@ -19,6 +19,7 @@ var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps'); // Sourcemaps must be manually generated due to a bug with typescript gulp compilation
 var sass = require('gulp-sass');
 var rename = require('gulp-rename');
+var uglify = require('gulp-uglify');
 
 // Node packages
 var del = require('del');
@@ -157,19 +158,27 @@ gulp.task('copy-tmp-to-dist', ['build'], function () {
   ]).pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
-// @TODO Uglify
-gulp.task('copy-dependencies-to-dist', ['copy-dependencies', 'bundle-angular-src'], function () {
+gulp.task('copy-dependencies-to-dist', ['copy-dependencies'], function () {
   return gulp.src([
     `${FOLDER_TMP}/dependencies.js`,
     `${FOLDER_TMP}/angular2-src/**/*`
   ])
     .pipe(concat('dependencies.js'))
+    .pipe(uglify())
     .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
-// @TODO Uglify
+gulp.task('copy-angular-src-to-dist', ['bundle-angular-src'], function () {
+  return gulp.src([
+    `${FOLDER_TMP}/angular2-src/**/*`
+  ])
+    .pipe(uglify())
+    .pipe(gulp.dest(FOLDER_DIST + '/angular2-src/'));
+});
+
 gulp.task('copy-app-to-dist', ['compile-ts'], function () {
   return gulp.src(`${FOLDER_TMP}/app.js`)
+    .pipe(uglify())
     .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
@@ -187,4 +196,4 @@ gulp.task('prod', ['mode-prod', 'build-prod']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
 gulp.task('build', ['clear-tmp', 'compile-ts', 'copy-html', 'compile-css', 'copy-dependencies', 'copy-system-map']);
-gulp.task('build-prod', ['clear-dist', 'build', 'bundle-angular-src', 'copy-tmp-to-dist', 'copy-dependencies-to-dist', 'copy-app-to-dist', 'copy-system-map-prod']);
+gulp.task('build-prod', ['clear-dist', 'build', 'bundle-angular-src', 'copy-tmp-to-dist', 'copy-dependencies-to-dist', 'copy-app-to-dist', 'copy-angular-src-to-dist', 'copy-system-map-prod']);

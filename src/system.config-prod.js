@@ -6,7 +6,9 @@
 (function (global) {
 
   // map tells the System loader where to look for things
-  var map = {};
+  var map = {
+    '@angular': 'angular2-src'
+  };
 
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {};
