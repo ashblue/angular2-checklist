@@ -21,6 +21,7 @@ var sass = require('gulp-sass');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var cleanCSS = require('gulp-clean-css');
+var zip = require('gulp-zip');
 
 // Node packages
 var del = require('del');
@@ -187,6 +188,12 @@ gulp.task('copy-app-to-dist', ['compile-ts'], function () {
     .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
+gulp.task('dist-zip', ['build-prod'], function () {
+  return gulp.src(`${FOLDER_DIST}/**/*`)
+    .pipe(zip('dist.zip'))
+    .pipe(gulp.dest('.'));
+});
+
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
 });
@@ -197,11 +204,11 @@ gulp.task('mode-prod', function () {
 
 gulp.task('default', ['dev']);
 gulp.task('dev', ['mode-dev', 'build', 'watch', 'serve']);
-gulp.task('prod', ['mode-prod', 'build-prod']);
+gulp.task('prod', ['mode-prod', 'build-prod-zip']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
 gulp.task('build', [
-  'clear-tmp', 
+  'clear-tmp',
   'compile-ts',
   'copy-html',
   'compile-css',
@@ -220,3 +227,5 @@ gulp.task('build-prod', [
   'copy-angular-src-to-dist',
   'copy-system-map-prod'
 ]);
+
+gulp.task('build-prod-zip', ['build-prod', 'dist-zip']);
