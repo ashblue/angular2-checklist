@@ -5,7 +5,6 @@
  * @TODO Do we need JSCS?
  * @TODO Do we need JSHint?
  * @TODO CLI files should include an @author for every file
- * @TODO Use environmental variables to configure gulp build instead of having separate prod and dev build tatsks
  */
 
 var gulp = require('gulp');
@@ -134,7 +133,6 @@ gulp.task('copy-system-map', function () {
   }
 });
 
-// @TODO Trigger after angular source is built
 gulp.task('copy-dependencies', ['bundle-angular-src', 'copy-config-env'], function () {
   var bundle = buildConfig.dependencies.core.concat(buildConfig.dependencies.other);
 
