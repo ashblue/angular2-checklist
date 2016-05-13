@@ -1,15 +1,11 @@
 /**
  * Gulp compildation for development tools
  * @author Ash Blue
- * @TODO Exclude sourcemaps during production mode
- * @TODO If production mode Ugflify compiled files
- * @TODO If production mode compress css
- * @TODO Destination directory for fonts taken from build-config.js
  * @TODO Typescript lint declaration
  * @TODO Do we need JSCS?
  * @TODO Do we need JSHint?
  * @TODO CLI files should include an @author for every file
- * @TODO Include build configuration target (dev, prod, qa)
+ * @TODO Use environmental variables to configure gulp build instead of having separate prod and dev build tatsks
  */
 
 var gulp = require('gulp');
@@ -26,11 +22,14 @@ var zip = require('gulp-zip');
 // Node packages
 var del = require('del');
 var path = require('path');
+var fs = require('fs');
 
 // Custom packages
 var tsProject = ts.createProject('src/tsconfig.json');
-var buildConfig = require('./src/build-config');
+var buildConfig = require('./src/configs/build-config');
+var envConfig = require('./src/configs/environment');
 var angular2Src = require('./systemjs/angular2-src');
+var blueprintBuilder = require('./blueprints/index');
 
 // Constants
 const SRC_ROOT = 'src';
@@ -114,30 +113,43 @@ gulp.task('serve-prod', ['build-prod'], function () {
 });
 
 gulp.task('copy-system-map', function () {
-  return gulp.src('src/system.config.js')
+  return gulp.src('src/configs/system.config.js')
     .pipe(gulp.dest(FOLDER_TMP + '/'));
 });
 
 gulp.task('copy-system-map-prod', ['build'], function () {
-  return gulp.src('src/system.config-prod.js')
+  return gulp.src('src/configs/system.config-prod.js')
     .pipe(rename('system.config.js'))
     .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
-gulp.task('copy-dependencies', function () {
+// @TODO Trigger after angular source is built
+gulp.task('copy-dependencies', ['bundle-angular-src', 'copy-config-env'], function () {
   var bundle = buildConfig.dependencies.core.concat(buildConfig.dependencies.other);
 
-  return gulp.src(bundle)
-    .pipe(sourcemaps.init())
-    .pipe(concat('dependencies.js'))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(FOLDER_TMP + '/'));
+  // Environmental configs are always the first dependency we inject
+  bundle.unshift(`${FOLDER_TMP}/environment.js`);
+
+  if (process.env.GULP_MODE === 'dev') {
+    return gulp.src(bundle)
+      .pipe(sourcemaps.init())
+      .pipe(concat('dependencies.js'))
+      .pipe(sourcemaps.write('.'))
+      .pipe(gulp.dest(FOLDER_TMP + '/'));
+  } else {
+    return gulp.src(bundle)
+      .pipe(concat('dependencies.js'))
+      .pipe(uglify())
+      .pipe(gulp.dest(FOLDER_DIST + '/'));
+  }
 });
 
 gulp.task('watch', function () {
   gulp.watch(['src/**/*.ts', 'src/tsconfig.json'], ['compile-ts']);
   gulp.watch('src/index.html', ['copy-html']);
-  gulp.watch(['src/build-config.js', 'src/system.config.js'], ['copy-dependencies']);
+  gulp.watch('src/build-config.js', ['copy-dependencies', 'copy-fonts']);
+  gulp.watch('src/configs/system.config.js', ['copy-system-map']);
+  gulp.watch('src/public/**/*', ['copy-public']);
   gulp.watch(SRC_STYLES + '/**/*.scss', ['compile-css']);
 });
 
@@ -145,7 +157,7 @@ function clearFolder (folder) {
   del.sync([folder + "/**/*"]);
 }
 
-gulp.task('bundle-angular-src', ['build'], function (cb) {
+gulp.task('bundle-angular-src', function (cb) {
   // Build all the angular dependencies
   angular2Src.build(function () {
     console.log('build complete successfully');
@@ -165,16 +177,6 @@ gulp.task('copy-tmp-to-dist', ['build'], function () {
   ]).pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
-gulp.task('copy-dependencies-to-dist', ['copy-dependencies'], function () {
-  return gulp.src([
-    `${FOLDER_TMP}/dependencies.js`,
-    `${FOLDER_TMP}/angular2-src/**/*`
-  ])
-    .pipe(concat('dependencies.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(FOLDER_DIST + '/'));
-});
-
 gulp.task('copy-fonts', function () {
   return gulp.src(buildConfig.fonts)
     .pipe(gulp.dest(FOLDER_TMP + '/fonts/'));
@@ -190,7 +192,7 @@ gulp.task('copy-public-to-dist', function () {
     .pipe(gulp.dest(FOLDER_DIST + '/public/'));
 });
 
-gulp.task('copy-angular-src-to-dist', ['bundle-angular-src'], function () {
+gulp.task('copy-angular-src-to-dist', ['build'], function () {
   return gulp.src([
     `${FOLDER_TMP}/angular2-src/**/*`
   ])
@@ -210,6 +212,17 @@ gulp.task('dist-zip', ['build-prod'], function () {
     .pipe(gulp.dest('.'));
 });
 
+gulp.task('copy-config-env', function () {
+  var blueprint = blueprintBuilder.getBlueprint('environment.js', [
+    {
+      key: 'details',
+      value: JSON.stringify(envConfig(process.env.GULP_MODE, process.env.GULP_TARGET))
+    }
+  ]);
+
+  fs.writeFileSync(`${FOLDER_TMP}/${blueprint.filename}`, blueprint.content);
+});
+
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
 });
@@ -218,9 +231,25 @@ gulp.task('mode-prod', function () {
   process.env.GULP_MODE = 'prod';
 });
 
+gulp.task('target-none', function () {
+  process.env.GULP_TARGET = null;
+});
+
+gulp.task('target-dev', function () {
+  process.env.GULP_TARGET = 'dev';
+});
+
+gulp.task('target-qa', function () {
+  process.env.GULP_TARGET = 'qa';
+});
+
+gulp.task('target-prod', function () {
+  process.env.GULP_TARGET = 'prod';
+});
+
 gulp.task('default', ['dev']);
 gulp.task('dev', ['mode-dev', 'build', 'watch', 'serve']);
-gulp.task('prod', ['mode-prod', 'build-prod-zip']);
+gulp.task('prod', ['mode-prod', 'target-prod', 'build-prod-zip']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
 gulp.task('build', [
@@ -229,6 +258,8 @@ gulp.task('build', [
   'copy-html',
   'copy-public',
   'compile-css',
+  'bundle-angular-src',
+  'copy-config-env',
   'copy-dependencies',
   'copy-system-map',
   'copy-fonts'
@@ -237,10 +268,8 @@ gulp.task('build', [
 gulp.task('build-prod', [
   'clear-dist',
   'build',
-  'bundle-angular-src',
   'copy-tmp-to-dist',
   'copy-css-to-dist',
-  'copy-dependencies-to-dist',
   'copy-app-to-dist',
   'copy-angular-src-to-dist',
   'copy-system-map-prod',
