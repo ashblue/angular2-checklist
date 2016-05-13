@@ -54,9 +54,15 @@ gulp.task('copy-css-to-dist', ['compile-css'], function () {
 });
 
 gulp.task('copy-html', function () {
+  var destination = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    destination = FOLDER_DIST;
+  }
+
   return gulp
     .src(SRC_ROOT + '/index.html')
-    .pipe(gulp.dest(FOLDER_TMP))
+    .pipe(gulp.dest(destination))
 });
 
 gulp.task('compile-ts', function () {
@@ -65,13 +71,19 @@ gulp.task('compile-ts', function () {
     .pipe(sourcemaps.init())
     .pipe(ts(tsProject));
 
-  return tsResult.js
-    .pipe(sourcemaps.write('.', {
-      sourceRoot: function (file) {
-        return file.cwd + '/src';
-      }
-    }))
-    .pipe(gulp.dest(FOLDER_TMP));
+  if (process.env.GULP_MODE === 'dev') {
+    return tsResult.js
+      .pipe(sourcemaps.write('.', {
+        sourceRoot: function (file) {
+          return file.cwd + '/src';
+        }
+      }))
+      .pipe(gulp.dest(FOLDER_TMP));
+  } else {
+    return tsResult.js
+      .pipe(uglify())
+      .pipe(gulp.dest(FOLDER_DIST));
+  }
 });
 
 gulp.task('clear-tmp', function () {
@@ -167,16 +179,6 @@ gulp.task('bundle-angular-src', function (cb) {
   });
 });
 
-gulp.task('copy-tmp-to-dist', ['build'], function () {
-  return gulp.src([
-    `${FOLDER_TMP}/**/*`,
-    `!${FOLDER_TMP}/angular2-src`,
-    `!${FOLDER_TMP}/**/*.css`,
-    `!${FOLDER_TMP}/**/*.js`,
-    `!${FOLDER_TMP}/**/*.map`
-  ]).pipe(gulp.dest(FOLDER_DIST + '/'));
-});
-
 gulp.task('copy-fonts', function () {
   return gulp.src(buildConfig.fonts)
     .pipe(gulp.dest(FOLDER_TMP + '/fonts/'));
@@ -268,7 +270,6 @@ gulp.task('build', [
 gulp.task('build-prod', [
   'clear-dist',
   'build',
-  'copy-tmp-to-dist',
   'copy-css-to-dist',
   'copy-app-to-dist',
   'copy-angular-src-to-dist',
