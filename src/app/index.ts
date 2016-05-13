@@ -6,7 +6,7 @@ export class Hero {
 
 @Component({
   selector: 'my-app',
-  template:`
+  template: `
     <h1>{{title}} <span class="glyphicon glyphicon-search" aria-hidden="true"></span></h1>
     <h2>{{hero.name}} details! <i class="fa fa-camera-retro" aria-hidden="true"></i></h2>
     <div><label>id: </label>{{hero.id}}</div>
@@ -14,7 +14,7 @@ export class Hero {
       <label>name: </label>
       <input [(ngModel)]="hero.name" placeholder="name">
     </div>
-    `
+  `
 })
 
 export class Index {

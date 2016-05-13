@@ -17,6 +17,7 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var cleanCSS = require('gulp-clean-css');
 var zip = require('gulp-zip');
+var tslint = require("gulp-tslint");
 
 // Node packages
 var del = require('del');
@@ -133,7 +134,7 @@ gulp.task('copy-system-map', function () {
   }
 });
 
-gulp.task('copy-dependencies', ['bundle-angular-src', 'copy-config-env'], function () {
+gulp.task('copy-dependencies', ['copy-config-env'], function () {
   var bundle = buildConfig.dependencies.core.concat(buildConfig.dependencies.other);
 
   // Environmental configs are always the first dependency we inject
@@ -154,7 +155,7 @@ gulp.task('copy-dependencies', ['bundle-angular-src', 'copy-config-env'], functi
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['src/**/*.ts', 'src/tsconfig.json'], ['compile-ts']);
+  gulp.watch(['src/**/*.ts', 'src/tsconfig.json', 'src/tslint.json'], ['tslint', 'compile-ts']);
   gulp.watch('src/index.html', ['copy-html']);
   gulp.watch('src/build-config.js', ['copy-dependencies', 'copy-fonts']);
   gulp.watch('src/configs/system.config.js', ['copy-system-map']);
@@ -223,6 +224,14 @@ gulp.task('copy-config-env', function () {
   fs.writeFileSync(`${FOLDER_TMP}/${blueprint.filename}`, blueprint.content);
 });
 
+gulp.task('tslint', function () {
+  return gulp.src('src/**/*.ts')
+    .pipe(tslint({
+      configuration: 'src/tslint.json'
+    }))
+    .pipe(tslint.report("verbose"));
+});
+
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
 });
@@ -254,6 +263,7 @@ gulp.task('prod-test', ['prod', 'serve-prod']);
 
 gulp.task('build', [
   'clear-folders',
+  'tslint',
   'compile-ts',
   'copy-html',
   'copy-public',
