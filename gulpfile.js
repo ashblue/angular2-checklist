@@ -124,14 +124,14 @@ gulp.task('serve-prod', ['build-prod'], function () {
 });
 
 gulp.task('copy-system-map', function () {
-  return gulp.src('src/configs/system.config.js')
-    .pipe(gulp.dest(FOLDER_TMP + '/'));
-});
-
-gulp.task('copy-system-map-prod', ['build'], function () {
-  return gulp.src('src/configs/system.config-prod.js')
-    .pipe(rename('system.config.js'))
-    .pipe(gulp.dest(FOLDER_DIST + '/'));
+  if (process.env.GULP_MODE === 'dev') {
+    return gulp.src('src/configs/system.config.js')
+      .pipe(gulp.dest(FOLDER_TMP + '/'));
+  } else {
+    return gulp.src('src/configs/system.config-prod.js')
+      .pipe(rename('system.config.js'))
+      .pipe(gulp.dest(FOLDER_DIST + '/'));
+  }
 });
 
 // @TODO Trigger after angular source is built
@@ -179,8 +179,14 @@ gulp.task('bundle-angular-src', function (cb) {
 });
 
 gulp.task('copy-fonts', function () {
+  var dest = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    dest = FOLDER_DIST
+  }
+
   return gulp.src(buildConfig.fonts)
-    .pipe(gulp.dest(FOLDER_TMP + '/fonts/'));
+    .pipe(gulp.dest(dest + '/fonts/'));
 });
 
 gulp.task('copy-public', function () {
@@ -194,23 +200,12 @@ gulp.task('copy-public', function () {
     .pipe(gulp.dest(dest + '/public/'));
 });
 
-gulp.task('copy-public-to-dist', function () {
-  return gulp.src(FOLDER_PUBLIC + '/**/*')
-    .pipe(gulp.dest(FOLDER_DIST + '/public/'));
-});
-
 gulp.task('copy-angular-src-to-dist', ['build'], function () {
   return gulp.src([
     `${FOLDER_TMP}/angular2-src/**/*`
   ])
     .pipe(uglify())
     .pipe(gulp.dest(FOLDER_DIST + '/angular2-src/'));
-});
-
-gulp.task('copy-app-to-dist', ['compile-ts'], function () {
-  return gulp.src(`${FOLDER_TMP}/app.js`)
-    .pipe(uglify())
-    .pipe(gulp.dest(FOLDER_DIST + '/'));
 });
 
 gulp.task('dist-zip', ['build-prod'], function () {
@@ -274,10 +269,7 @@ gulp.task('build', [
 
 gulp.task('build-prod', [
   'build',
-  'copy-app-to-dist',
-  'copy-angular-src-to-dist',
-  'copy-system-map-prod',
-  'copy-public-to-dist'
+  'copy-angular-src-to-dist' // Extra step since handling the source is awkward
 ]);
 
 gulp.task('build-prod-zip', ['build-prod', 'dist-zip']);
