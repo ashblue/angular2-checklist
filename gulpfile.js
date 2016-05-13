@@ -39,18 +39,19 @@ const FOLDER_TMP = 'tmp';
 const FOLDER_NODE_MODULES = 'node_modules';
 const FOLDER_PUBLIC = SRC_ROOT + '/public';
 
-gulp.task('compile-css', function () {
-  return gulp.src(SRC_STYLES + '/index.scss')
-    .pipe(sourcemaps.init())
-    .pipe(sass().on('error', sass.logError))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(FOLDER_TMP));
-});
-
-gulp.task('copy-css-to-dist', ['compile-css'], function () {
-  return gulp.src(`${FOLDER_TMP}/index.css`)
-    .pipe(cleanCSS())
-    .pipe(gulp.dest(FOLDER_DIST));
+gulp.task('copy-css', function () {
+  if (process.env.GULP_MODE === 'dev') {
+    return gulp.src(SRC_STYLES + '/index.scss')
+      .pipe(sourcemaps.init())
+      .pipe(sass().on('error', sass.logError))
+      .pipe(sourcemaps.write('.'))
+      .pipe(gulp.dest(FOLDER_TMP));
+  } else {
+    return gulp.src(SRC_STYLES + '/index.scss')
+      .pipe(sass().on('error', sass.logError))
+      .pipe(cleanCSS())
+      .pipe(gulp.dest(FOLDER_DIST));
+  }
 });
 
 gulp.task('copy-html', function () {
@@ -183,8 +184,14 @@ gulp.task('copy-fonts', function () {
 });
 
 gulp.task('copy-public', function () {
+  var dest = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    dest = FOLDER_DIST
+  }
+
   return gulp.src(FOLDER_PUBLIC + '/**/*')
-    .pipe(gulp.dest(FOLDER_TMP + '/public/'));
+    .pipe(gulp.dest(dest + '/public/'));
 });
 
 gulp.task('copy-public-to-dist', function () {
@@ -257,7 +264,7 @@ gulp.task('build', [
   'compile-ts',
   'copy-html',
   'copy-public',
-  'compile-css',
+  'copy-css',
   'bundle-angular-src',
   'copy-config-env',
   'copy-dependencies',
@@ -267,7 +274,6 @@ gulp.task('build', [
 
 gulp.task('build-prod', [
   'build',
-  'copy-css-to-dist',
   'copy-app-to-dist',
   'copy-angular-src-to-dist',
   'copy-system-map-prod',
