@@ -86,12 +86,10 @@ gulp.task('compile-ts', function () {
   }
 });
 
-gulp.task('clear-tmp', function () {
+gulp.task('clear-folders', function () {
   clearFolder(FOLDER_TMP);
   clearFolder(FOLDER_TMP + '/**/*');
-});
 
-gulp.task('clear-dist', function () {
   clearFolder(FOLDER_DIST);
   clearFolder(FOLDER_DIST + '/**/*');
 });
@@ -255,7 +253,7 @@ gulp.task('prod', ['mode-prod', 'target-prod', 'build-prod-zip']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
 gulp.task('build', [
-  'clear-tmp',
+  'clear-folders',
   'compile-ts',
   'copy-html',
   'copy-public',
@@ -268,7 +266,6 @@ gulp.task('build', [
 ]);
 
 gulp.task('build-prod', [
-  'clear-dist',
   'build',
   'copy-css-to-dist',
   'copy-app-to-dist',
