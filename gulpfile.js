@@ -19,6 +19,7 @@ var cleanCSS = require('gulp-clean-css');
 var zip = require('gulp-zip');
 var tslint = require("gulp-tslint");
 var gulpReplace = require('gulp-replace');
+var inlineNg2Template = require('gulp-inline-ng2-template');
 
 // Node packages
 var del = require('del');
@@ -83,9 +84,11 @@ gulp.task('compile-ts', function () {
           return file.cwd + '/src';
         }
       }))
+      .pipe(inlineNg2Template({ base: '/src/app' }))
       .pipe(gulp.dest(FOLDER_TMP));
   } else {
     return tsResult.js
+      .pipe(inlineNg2Template({ base: '/src/app' }))
       .pipe(uglify())
       .pipe(gulp.dest(FOLDER_DIST));
   }

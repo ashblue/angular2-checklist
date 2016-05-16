@@ -1,6 +1,6 @@
 /// <reference path="./shim.ts" />
 
 import {bootstrap} from '@angular/platform-browser-dynamic';
-import {Index} from './app/index';
+import {Router} from './app/router';
 
-bootstrap(Index);
+bootstrap(Router);
