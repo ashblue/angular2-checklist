@@ -20,6 +20,7 @@ var zip = require('gulp-zip');
 var tslint = require("gulp-tslint");
 var gulpReplace = require('gulp-replace');
 var inlineNg2Template = require('gulp-inline-ng2-template');
+var gulpNodemon = require('gulp-nodemon');
 
 // Node packages
 var del = require('del');
@@ -118,6 +119,10 @@ gulp.task('serve', ['build'], function () {
         {
           source: '/node_modules',
           target: 'http://localhost:8010'
+        },
+        {
+          source: '/api',
+          target: 'http://localhost:8020/api'
         }
       ]
     }));
@@ -250,6 +255,13 @@ gulp.task('tslint', function () {
     .pipe(tslint.report("verbose"));
 });
 
+gulp.task('mock-api', function () {
+  gulpNodemon({
+    script: 'mock-api/server.js',
+    watch: ['mock-api/']
+  });
+});
+
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
 });
@@ -275,7 +287,7 @@ gulp.task('target-prod', function () {
 });
 
 gulp.task('default', ['dev']);
-gulp.task('dev', ['mode-dev', 'build', 'watch', 'serve']);
+gulp.task('dev', ['mode-dev', 'build', 'watch', 'mock-api', 'serve']);
 gulp.task('prod', ['mode-prod', 'target-prod', 'build-prod-zip']);
 gulp.task('prod-test', ['prod', 'serve-prod']);
 
