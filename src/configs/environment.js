@@ -8,17 +8,7 @@
 module.exports = function (env, target) {
   var ENV = {
     environment: env,
-    target: target,
-
-    contentSecurityPolicy: {
-      'default-src': "'self' static.olark.com *.typekit.net",
-      'script-src': "'self' 'unsafe-inline' www.google-analytics.com static.olark.com *.olark.com *.typekit.net",
-      'font-src': "'self' data: *.typekit.net",
-      'connect-src': "'self' www.google-analytics.com *.olark.com",
-      'img-src': "'self' www.google-analytics.com placeholdit.imgix.net *.olark.com placehold.it data: *.typekit.net",
-      'style-src': "'self' 'unsafe-inline' *.olark.com *.typekit.net",
-      'media-src': "'self' *.olark.com"
-    }
+    target: target
   };
 
   if (env === 'dev') {

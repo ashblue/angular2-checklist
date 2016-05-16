@@ -18,6 +18,7 @@ var uglify = require('gulp-uglify');
 var cleanCSS = require('gulp-clean-css');
 var zip = require('gulp-zip');
 var tslint = require("gulp-tslint");
+var gulpReplace = require('gulp-replace');
 
 // Node packages
 var del = require('del');
@@ -30,6 +31,7 @@ var buildConfig = require('./src/configs/build-config');
 var envConfig = require('./src/configs/environment');
 var angular2Src = require('./systemjs/angular2-src');
 var blueprintBuilder = require('./blueprints/index');
+var contentSecurityPolicy = require('./src/configs/content-security-policy');
 
 // Constants
 const SRC_ROOT = 'src';
@@ -55,6 +57,7 @@ gulp.task('copy-css', function () {
 });
 
 gulp.task('copy-html', function () {
+  var csp = contentSecurityPolicy(process.env.GULP_MODE, process.env.GULP_TARGET).getString();
   var destination = FOLDER_TMP;
 
   if (process.env.GULP_MODE === 'prod') {
@@ -63,6 +66,7 @@ gulp.task('copy-html', function () {
 
   return gulp
     .src(SRC_ROOT + '/index.html')
+    .pipe(gulpReplace('@CSP@', csp))
     .pipe(gulp.dest(destination))
 });
 
@@ -181,18 +185,29 @@ gulp.task('copy-fonts', function () {
   var dest = FOLDER_TMP;
 
   if (process.env.GULP_MODE === 'prod') {
-    dest = FOLDER_DIST
+    dest = FOLDER_DIST;
   }
 
   return gulp.src(buildConfig.fonts)
     .pipe(gulp.dest(dest + '/fonts/'));
 });
 
+gulp.task('copy-script-boot', function () {
+  var dest = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    dest = FOLDER_DIST;
+  }
+
+  return gulp.src('src/boot.js')
+    .pipe(gulp.dest(dest + '/'));
+});
+
 gulp.task('copy-public', function () {
   var dest = FOLDER_TMP;
 
   if (process.env.GULP_MODE === 'prod') {
-    dest = FOLDER_DIST
+    dest = FOLDER_DIST;
   }
 
   return gulp.src(FOLDER_PUBLIC + '/**/*')
@@ -268,6 +283,7 @@ gulp.task('build', [
   'copy-html',
   'copy-public',
   'copy-css',
+  'copy-script-boot',
   'bundle-angular-src',
   'copy-config-env',
   'copy-dependencies',

@@ -5,6 +5,7 @@
 
   <title>Consumer Portal</title>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="@CSP@">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!--<link rel="icon" type="image/x-icon" href="favicon.ico">-->
   <link rel="stylesheet" href="index.css">
@@ -15,9 +16,6 @@
   <script src="dependencies.js"></script>
   <script src="system.config.js"></script>
   <script src="app.js"></script>
-
-  <script>
-    System.import('main').catch(function(err){ console.error(err);  });
-  </script>
+  <script src="boot.js"></script>
 </body>
 </html>
