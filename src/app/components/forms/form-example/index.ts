@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
+import {FormBase} from '../base';
 
 @Component({
   selector: 'form-example',
   templateUrl: 'components/forms/form-example/index.html'
 })
 
-export class FormExample {
+export class FormExample extends FormBase {
   constructor() {
     console.log('form default loaded');
   }
