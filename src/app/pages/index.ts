@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
-export class Hero {
-  id: number;
-  name: string;
-}
+import {Component} from '@angular/core';
+import {Hero} from '../components/models/hero';
+import {FormExample} from '../components/forms/form-example/index';
+import helpers from '../utilities/helpers';
 
 @Component({
   selector: 'page-index',
-  templateUrl: 'pages/index.html'
+  templateUrl: 'pages/index.html',
+  directives: [
+    FormExample
+  ]
 })
 
 export class PageIndex {
@@ -16,7 +18,8 @@ export class PageIndex {
     name: 'Windstorm'
   };
 
-  constructor () {
+  constructor() {
     console.log('hit');
+    helpers.myHelper();
   }
 }

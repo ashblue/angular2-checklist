@@ -162,7 +162,7 @@ gulp.task('copy-dependencies', ['copy-config-env'], function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['src/**/*.ts', 'src/tsconfig.json', 'src/tslint.json'], ['tslint', 'compile-ts']);
+  gulp.watch(['src/**/*.ts', 'src/tsconfig.json', 'src/tslint.json', 'src/**/*.html'], ['tslint', 'compile-ts']);
   gulp.watch('src/index.html', ['copy-html']);
   gulp.watch('src/build-config.js', ['copy-dependencies', 'copy-fonts']);
   gulp.watch('src/configs/system.config.js', ['copy-system-map']);
