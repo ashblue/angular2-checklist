@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
-import {PageIndex} from './pages/index';
+import {PageHome} from './pages/home/index';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router-deprecated';
 
 @Component({
   selector: 'my-app',
-  template: `<page-index></page-index>`,
+  template: `<page-home></page-home>`,
   directives: [
-    PageIndex,
+    PageHome,
     ROUTER_DIRECTIVES
   ],
   providers: [
