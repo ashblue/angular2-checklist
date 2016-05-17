@@ -24,7 +24,7 @@ module.exports = function (env, target) {
   var csp = {
     data: {
       'default-src': "'self' static.olark.com *.typekit.net",
-      'script-src': "'self' www.google-analytics.com static.olark.com *.olark.com *.typekit.net",
+      'script-src': "'self' www.google-analytics.com static.olark.com *.olark.com *.typekit.net 'unsafe-eval'",
       'font-src': "'self' data: *.typekit.net",
       'connect-src': "'self' www.google-analytics.com *.olark.com",
       'img-src': "'self' www.google-analytics.com placeholdit.imgix.net *.olark.com placehold.it data: *.typekit.net",
@@ -46,7 +46,7 @@ module.exports = function (env, target) {
   if (env === 'dev') {
     // We must enable live reload here
     // These are not production safe, do not include these properties in prod mode
-    csp.data['script-src'] += " localhost:* 'unsafe-inline' 'unsafe-eval'";
+    csp.data['script-src'] += " localhost:* 'unsafe-inline'";
     csp.data['connect-src'] += " ws://localhost:* localhost:*";
   }
 

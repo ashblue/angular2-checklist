@@ -28,14 +28,7 @@
     "new-parens": true,
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": false,
     "no-consecutive-blank-lines": true,
     "no-construct": true,
     "no-debugger": true,
@@ -52,7 +45,7 @@
     "no-unused-variable": true,
     "no-unreachable": true,
     "no-use-before-declare": true,
-    "no-var-keyword": true,
+    "no-var-keyword": false,
     "object-literal-sort-keys": false,
     "one-line": [
       true,
