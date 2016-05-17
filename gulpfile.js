@@ -26,6 +26,7 @@ var gulpNodemon = require('gulp-nodemon');
 var del = require('del');
 var path = require('path');
 var fs = require('fs');
+var uuid = require('node-uuid');
 
 // Custom packages
 var tsProject = ts.createProject('src/tsconfig.json');
@@ -273,6 +274,25 @@ gulp.task('mock-api', function () {
   });
 });
 
+// Version number for busting the cache
+gulp.task('create-version-number', function (cb) {
+  var id = uuid.v4();
+  var dest = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    dest = FOLDER_DIST;
+  }
+
+  fs.writeFile(dest + '/version.txt', id, function (err) {
+    if (err) {
+      cb(err);
+    } else {
+      cb();
+    }
+  });
+});
+
+// Environmental configs
 gulp.task('mode-dev', function () {
   process.env.GULP_MODE = 'dev';
 });
@@ -297,6 +317,7 @@ gulp.task('target-prod', function () {
   process.env.GULP_TARGET = 'prod';
 });
 
+// Tasks meant for execution
 gulp.task('default', ['dev']);
 gulp.task('dev', ['mode-dev', 'build', 'watch', 'mock-api', 'serve']);
 gulp.task('prod', ['mode-prod', 'target-prod', 'build-prod-zip']);
@@ -320,6 +341,7 @@ gulp.task('build', [
 
 gulp.task('build-prod', [
   'build',
+  'create-version-number',
   'copy-angular-src-to-dist' // Extra step since handling the source is awkward
 ]);
 
