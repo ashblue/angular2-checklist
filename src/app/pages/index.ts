@@ -20,6 +20,7 @@ export class PageIndex extends PageBase {
   };
 
   constructor() {
+    super();
     console.log('hit');
     helpers.myHelper();
   }

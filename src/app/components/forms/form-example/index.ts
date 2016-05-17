@@ -8,6 +8,7 @@ import {FormBase} from '../base';
 
 export class FormExample extends FormBase {
   constructor() {
+    super();
     console.log('form default loaded');
   }
 }

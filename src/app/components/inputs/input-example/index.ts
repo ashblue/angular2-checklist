@@ -8,6 +8,7 @@ import {InputBase} from '../base';
 
 export class FormExample extends InputBase {
   constructor() {
+    super();
     console.log('input example loaded');
   }
 }
