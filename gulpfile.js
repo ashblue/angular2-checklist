@@ -74,23 +74,31 @@ gulp.task('copy-html', function () {
 });
 
 gulp.task('compile-ts', function () {
+  var ng2TemplateOptions = {
+    base: '/src/app',
+    useRelativePaths: false, // Would be nice to have, but currently bugged
+    target: 'es5' // Never compile ES6, Uglify will choke and die
+  };
+
   var tsResult = tsProject
     .src()
     .pipe(sourcemaps.init())
     .pipe(ts(tsProject));
 
   if (process.env.GULP_MODE === 'dev') {
+    ng2TemplateOptions.supportNonExistentFiles = true;
+
     return tsResult.js
       .pipe(sourcemaps.write('.', {
         sourceRoot: function (file) {
           return file.cwd + '/src';
         }
       }))
-      .pipe(inlineNg2Template({ base: '/src/app' }))
+      .pipe(inlineNg2Template(ng2TemplateOptions))
       .pipe(gulp.dest(FOLDER_TMP));
   } else {
     return tsResult.js
-      .pipe(inlineNg2Template({ base: '/src/app' }))
+      .pipe(inlineNg2Template(ng2TemplateOptions))
       .pipe(uglify())
       .pipe(gulp.dest(FOLDER_DIST));
   }

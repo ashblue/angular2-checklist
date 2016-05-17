@@ -3,7 +3,7 @@ import {InputBase} from '../base';
 
 @Component({
   selector: 'input-example',
-  templateUrl: 'components/inputs/input-example/index.html'
+  templateUrl: 'modules/components/inputs/input-example/index.html'
 })
 
 export class FormExample extends InputBase {

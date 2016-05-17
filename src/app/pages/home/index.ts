@@ -1,7 +1,7 @@
 import {PageBase} from '../base';
 import {Component} from '@angular/core';
-import {Hero} from '../../components/models/hero';
-import {FormExample} from '../../components/forms/form-example/index';
+import {Hero} from '../../modules/models/hero';
+import {FormExample} from '../../modules/components/forms/form-example/index';
 import helpers from '../../utilities/helpers';
 
 @Component({

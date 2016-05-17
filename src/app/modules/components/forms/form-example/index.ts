@@ -3,7 +3,7 @@ import {FormBase} from '../base';
 
 @Component({
   selector: 'form-example',
-  templateUrl: 'components/forms/form-example/index.html'
+  templateUrl: 'modules/components/forms/form-example/index.html'
 })
 
 export class FormExample extends FormBase {

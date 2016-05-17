@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 
 @Component({
   selector: 'other-example',
-  templateUrl: 'components/other/other-example/index.html'
+  templateUrl: 'modules/components/other/other-example/index.html'
 })
 
 export class FormExample {
