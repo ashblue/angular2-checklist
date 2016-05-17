@@ -211,6 +211,17 @@ gulp.task('copy-script-boot', function () {
     .pipe(gulp.dest(dest + '/'));
 });
 
+gulp.task('copy-crossdomain', function () {
+  var dest = FOLDER_TMP;
+
+  if (process.env.GULP_MODE === 'prod') {
+    dest = FOLDER_DIST;
+  }
+
+  return gulp.src('src/crossdomain.xml')
+    .pipe(gulp.dest(dest + '/'));
+});
+
 gulp.task('copy-public', function () {
   var dest = FOLDER_TMP;
 
@@ -299,6 +310,7 @@ gulp.task('build', [
   'copy-public',
   'copy-css',
   'copy-script-boot',
+  'copy-crossdomain',
   'bundle-angular-src',
   'copy-config-env',
   'copy-dependencies',
